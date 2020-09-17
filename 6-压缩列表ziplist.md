@@ -1,0 +1,75 @@
+### 压缩列表
+
++ **简要：**是列表键和哈希键的底层实现之一。当一个列表键只包含少量列表项，并且每个列表项要么就是小整数值，要么就是长度比较短的字符串，那么`Redis`就会使用压缩列表来做列表键的底层实现。
+
+  ![image-20200914161005458](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914161005458.png)
+
+### 二、压缩列表的构成
+
++ **列表组成部分**
+  + ![image-20200914161544138](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914161544138.png)
+  + **补充：**![image-20200914164005197](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914164005197.png)
+
++ **列表节点的构成**
+
+  + **简要：**每个列表节点可以保存一个字节数组或者一个整数值，其中字节数组可以是一下三子长度的其中一种：
+    ![image-20200914164211037](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914164211037.png)
+    整数值的可以是下面六种长度中的一种：
+    ![image-20200914164442229](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914164442229.png)
+
+  + **节点三个部分**
+    ![image-20200914164604192](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914164604192.png)
+
+    + `previous_entry_length`
+
+      ​	以字节为单位，记录压缩列表中其**前一个节点的长度(1字节/5字节)**
+
+      ​	其中：前一个节点的长度**小于 254字节**，则该 `previous_entry_length`= 1字节（前一个节点的长度就保存在这一个字节里面）
+
+      ​				前一个节点的长度**大于 254字节**，则该 `previous_entry_length`= 5字节（注意：该5个字节里，其中属性的第一个字节会被设置为`0xFE`(254),而之后的4个字节则保存前一个节点的长度）
+
+      ![image-20200914165358559](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914165358559.png)
+      **用途：**
+      
+      ​			通过指针运算，根据`当前节点的起始地址`来计算出`前一个节点的起始地址`。
+      
+      ​			 压缩列表的`从表尾向表头遍历`操作就是使用该原理实现，得到前一个节点的起始地址指针，通过该节点的`previous_entry_length`属性，可以一直进行节点回溯，直到表头。
+      
+      **比如：**
+      
+      ![image-20200915091232218](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915091232218.png)
+      
+    + `encoding`
+
+      ​	节点的`encoding`属性记录了节点中`content`属性所保存数据的**类型和长度**
+      ![image-20200915093106234](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915093106234.png)
+
+    + `content`
+
+      ​	负责保存节点得值，，可以是一个字节数组或者整数，值得类型和长度是由`encoding`属性决定。
+      ![image-20200915093214651](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915093214651.png)
+
+### 三、连锁更新
+
++ **简要：**`Redis`中，在特殊情况下产生的连续多次空间扩展操作称之为`连锁更新(cascade update)`
+
++ **场景：**在上面说的，每个节点的`previous_entry_length`属性记录前一个节点的长度，这个长度有个界值，254字节，，上面说了存在两种情况：**小于254字节、大于等于254字节**；每种对应的长度是不同的。
+
+  ​		如果在一个压缩列表中，由多个连续、长度介于**250-253字节**的节点，也就是说他们的`previous_entry_length`属性值都是 1 字节，，假设我在表头处插入一个长度大于254字节的新节点new，由于new节点下一个节点对应`previous_entry_length`值是 1字节长，但是 new的长度大于等于254字节了，那么该节点需要对`previous_entry_length`重新分配空间。以此类推，下一个节点记录上一个节点的长度，所以对应下一个节点需要重新分配空间。这类过程就称之为`连锁更新`
+
++ **时间复杂度：**每次空间重新分配最坏情况复杂度`O(N)`、所以连锁更新的最坏复杂度为`O(N^2)`
+
++ 注意： 连锁更新造成的性能问题的几率很低：
+
+  + 1、压缩列表中要恰好存在多个连续的、长度介于250-253字节之间的节点，连锁更新才有可能被引发。情况并不多见。
+  + 2、即使出现连锁更新，但只要更新节点不多，就不会对性能造成影响。比如：对3、5个节点进行连锁更新。
+
+  `ziplistPush`等命令的平均复杂度仅为`O(N)`.
+
+### 四、压缩列表API
+
+![image-20200915101507608](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915101507608.png)
+
+### 五、总结
+
+![image-20200915101606858](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915101606858.png)
