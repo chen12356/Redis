@@ -5,10 +5,10 @@
 
 + 其他：`SDS`还用作缓冲区(buffer)：`AOF`缓冲区、客户状态的输入缓冲区
 + **`SDS`的定义**
-  + ![image-20200911103336817](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911103336817.png)
+  + ![image-20200911103336817](.\imges\image-20200911103336817.png)
   + 
 
-![image-20200911103513874](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911103513874.png)
+![image-20200911103513874](.\imges\image-20200911103513874.png)
 
 
 
@@ -23,9 +23,9 @@
 + **杜绝缓冲区溢出**
 
   + C容易造成缓冲区溢出。因为C 不记录长度。如果进行字符串拼接,没有分配足够空间，那么就用可能造成缓冲区 溢出问题--导致内容被修改，丢失等
-    + ![image-20200911105813847](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911105813847.png)
+    + ![image-20200911105813847](.\imges\image-20200911105813847.png)
   + `SDS`完全杜绝溢出：由于`SDS`的`API`中存在一个 `sdscat`拼接函数。该函数在拼接前会 先检查给定 `SDS`的空间是否足够，如果不够，该函数会先扩展`SDS`空间，然后在进行拼接。
-    + ![image-20200911105658123](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911105658123.png)
+    + ![image-20200911105658123](.\imges\image-20200911105658123.png)
 
 + **内存重分配次数**(修改字符串时引起)
 
@@ -39,7 +39,7 @@
 
       ​	下图为主要公式：
 
-      ​				![image-20200911131325264](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911131325264.png)
+      ​				![image-20200911131325264](.\imges\image-20200911131325264.png)
 
       ​	
 
@@ -62,10 +62,10 @@
 
 虽然`Redis`是通过`C语言`来编写的，但是由于`Redis`利用自己的 `SDS`简单动态字符串，使得其于C字符串有明显的区别。
 
-![image-20200911134102386](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911134102386.png)
+![image-20200911134102386](.\imges\image-20200911134102386.png)
 
 + `SDS API`
 
-  ![image-20200911134340926](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911134340926.png)
+  ![image-20200911134340926](.\imges\image-20200911134340926.png)
 
-![image-20200911134357452](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911134357452.png)
+![image-20200911134357452](.\imges\image-20200911134357452.png)

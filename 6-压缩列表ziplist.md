@@ -2,23 +2,23 @@
 
 + **简要：**是列表键和哈希键的底层实现之一。当一个列表键只包含少量列表项，并且每个列表项要么就是小整数值，要么就是长度比较短的字符串，那么`Redis`就会使用压缩列表来做列表键的底层实现。
 
-  ![image-20200914161005458](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914161005458.png)
+  ![image-20200914161005458](.\imges\image-20200914161005458.png)
 
 ### 二、压缩列表的构成
 
 + **列表组成部分**
-  + ![image-20200914161544138](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914161544138.png)
-  + **补充：**![image-20200914164005197](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914164005197.png)
+  + ![image-20200914161544138](.\imges\image-20200914161544138.png)
+  + **补充：**![image-20200914164005197](.\imges\image-20200914164005197.png)
 
 + **列表节点的构成**
 
   + **简要：**每个列表节点可以保存一个字节数组或者一个整数值，其中字节数组可以是一下三子长度的其中一种：
-    ![image-20200914164211037](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914164211037.png)
+    ![image-20200914164211037](.\imges\image-20200914164211037.png)
     整数值的可以是下面六种长度中的一种：
-    ![image-20200914164442229](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914164442229.png)
+    ![image-20200914164442229](.\imges\image-20200914164442229.png)
 
   + **节点三个部分**
-    ![image-20200914164604192](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914164604192.png)
+    ![image-20200914164604192](.\imges\image-20200914164604192.png)
 
     + `previous_entry_length`
 
@@ -28,7 +28,7 @@
 
       ​				前一个节点的长度**大于 254字节**，则该 `previous_entry_length`= 5字节（注意：该5个字节里，其中属性的第一个字节会被设置为`0xFE`(254),而之后的4个字节则保存前一个节点的长度）
 
-      ![image-20200914165358559](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200914165358559.png)
+      ![image-20200914165358559](.\imges\image-20200914165358559.png)
       **用途：**
       
       ​			通过指针运算，根据`当前节点的起始地址`来计算出`前一个节点的起始地址`。
@@ -37,17 +37,17 @@
       
       **比如：**
       
-      ![image-20200915091232218](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915091232218.png)
+      ![image-20200915091232218](.\imges\image-20200915091232218.png)
       
     + `encoding`
 
       ​	节点的`encoding`属性记录了节点中`content`属性所保存数据的**类型和长度**
-      ![image-20200915093106234](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915093106234.png)
+      ![image-20200915093106234](.\imges\image-20200915093106234.png)
 
     + `content`
 
       ​	负责保存节点得值，，可以是一个字节数组或者整数，值得类型和长度是由`encoding`属性决定。
-      ![image-20200915093214651](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915093214651.png)
+      ![image-20200915093214651](.\imges\image-20200915093214651.png)
 
 ### 三、连锁更新
 
@@ -68,8 +68,8 @@
 
 ### 四、压缩列表API
 
-![image-20200915101507608](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915101507608.png)
+![image-20200915101507608](.\imges\image-20200915101507608.png)
 
 ### 五、总结
 
-![image-20200915101606858](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200915101606858.png)
+![image-20200915101606858](.\imges\image-20200915101606858.png)

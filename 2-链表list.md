@@ -2,14 +2,14 @@
 
 + `Redis`中列表其实就是 链表结构，比如 列表键的 底层实现就是 链表，当一个列表键包含数量比较多的元素，或者列表中包含的元素都是比较长的字符串，都会用链表作为 列表键的底层实现。
 
-  ![image-20200911140309916](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20200911140309916.png)
+  ![image-20200911140309916](.\imges\image-20200911140309916.png)
 
 + **链表结构**
 
-  ![image-20200911140529510](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911140529510.png)
+  ![image-20200911140529510](.\imges\image-20200911140529510.png)
 
-  ![image-20200911141034081](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911141034081.png)
+  ![image-20200911141034081](.\imges\image-20200911141034081.png)
 
 ### 总结
 
-![image-20200911141209235](C:\Users\Administrator\Desktop\Redis详解\imges\image-20200911141209235.png)
+![image-20200911141209235](.\imges\image-20200911141209235.png)
